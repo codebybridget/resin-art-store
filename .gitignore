@@ -1,0 +1,22 @@
+# node modules
+node_modules
+
+# env files (all)
+.env
+.env.local
+.env.development
+.env.production
+
+# builds
+dist
+build
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
+Backend/uploads

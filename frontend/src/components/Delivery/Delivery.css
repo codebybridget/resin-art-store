@@ -1,0 +1,86 @@
+/* frontend/src/components/Delivery/Delivery.css */
+
+.delivery-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 55px 16px;
+}
+
+.delivery-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
+}
+
+.delivery-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.delivery-subtitle {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.delivery-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.delivery-table th,
+.delivery-table td {
+  text-align: left;
+  padding: 12px 12px;
+  font-size: 14px;
+}
+
+.delivery-table th {
+  background: #f9fafb;
+  font-weight: 800;
+  color: #111827;
+}
+
+.delivery-table tr:not(:last-child) td {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.delivery-fee-pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.delivery-fee-pill.confirm {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+@media (max-width: 700px) {
+  .delivery-card {
+    padding: 16px;
+  }
+
+  .delivery-title {
+    font-size: 18px;
+  }
+
+  .delivery-table th,
+  .delivery-table td {
+    font-size: 13px;
+    padding: 10px;
+  }
+}

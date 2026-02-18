@@ -1,0 +1,131 @@
+.myOrders {
+  width: 100%;
+  min-height: 70vh;
+  padding: 40px 8%;
+  background: #fff;
+}
+
+.myOrders h2 {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  color: #111;
+}
+
+.myOrders .container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ORDER CARD */
+.my-orders-order {
+  display: flex;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff6f6;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: 0.2s ease;
+}
+
+.my-orders-order:hover {
+  transform: translateY(-2px);
+}
+
+/* ICON */
+.my-orders-order img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  margin-top: 4px;
+}
+
+/* RIGHT CONTENT */
+.my-orders-order div {
+  flex: 1;
+}
+
+/* ITEMS LIST */
+.my-orders-order div p:first-child {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #c62828;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.my-orders-order div p span {
+  display: inline-block;
+}
+
+/* DETAILS */
+.my-orders-order p {
+  font-size: 14px;
+  margin: 6px 0;
+  color: #222;
+}
+
+.my-orders-order strong {
+  font-weight: 700;
+  color: #111;
+}
+
+/* STATUS DOT LINE */
+.my-orders-order p b {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+/* BUTTON */
+.my-orders-order button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.my-orders-order button:hover {
+  opacity: 0.9;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .myOrders {
+    padding: 25px 5%;
+  }
+
+  .myOrders h2 {
+    font-size: 26px;
+  }
+
+  .my-orders-order {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .my-orders-order img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .my-orders-order div p:first-child {
+    font-size: 13px;
+  }
+
+  .my-orders-order p {
+    font-size: 13px;
+  }
+
+  .my-orders-order button {
+    width: 100%;
+  }
+}

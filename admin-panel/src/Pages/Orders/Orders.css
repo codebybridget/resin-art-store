@@ -1,0 +1,158 @@
+.admin-orders-page {
+  flex: 1;
+  padding: 20px;
+}
+
+.admin-orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.admin-orders-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-orders-empty {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.admin-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-order-card {
+  display: flex;
+  gap: 14px;
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+}
+
+.admin-order-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.admin-order-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-order-items {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-order-customer {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-order-name {
+  font-weight: 700;
+}
+
+.admin-order-phone {
+  opacity: 0.8;
+}
+
+.admin-order-address p {
+  margin: 0;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+.admin-order-total {
+  font-size: 15px;
+}
+
+.admin-order-payment {
+  font-size: 15px;
+}
+
+.paid {
+  color: green;
+  font-weight: 700;
+}
+
+.not-paid {
+  color: #d60000;
+  font-weight: 700;
+}
+
+.admin-order-actions {
+  width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.admin-order-status {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.danger-btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #ff4d4d;
+  color: white;
+  font-weight: 700;
+}
+
+.danger-btn:hover {
+  background: #e83b3b;
+}
+
+.danger-btn-outline {
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid #ff4d4d;
+  background: transparent;
+  color: #ff4d4d;
+  font-weight: 700;
+}
+
+.danger-btn-outline:hover {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .admin-order-card {
+    flex-direction: column;
+  }
+
+  .admin-order-actions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .admin-order-status {
+    flex: 1;
+  }
+
+  .danger-btn-outline {
+    flex: 1;
+  }
+}

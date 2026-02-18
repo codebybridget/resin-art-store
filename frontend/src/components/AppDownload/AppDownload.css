@@ -1,0 +1,73 @@
+.app-download {
+  width: 100%;
+  padding: 60px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.app-download p {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.app-download-platforms {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.app-download-platforms img {
+  width: 160px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.app-download-platforms img:hover {
+  transform: scale(1.05);
+}
+
+.install-btn {
+  margin-top: 18px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.install-btn:hover {
+  background: #000;
+}
+
+.install-note {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.install-note.success {
+  color: green;
+  font-weight: 700;
+}
+
+.ios-install-box {
+  margin-top: 18px;
+  background: #f7f7f7;
+  padding: 14px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.store-note {
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: 0.7;
+}

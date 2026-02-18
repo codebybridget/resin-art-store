@@ -1,0 +1,478 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 5000;
+
+  background: white;
+  padding: 16px 0px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-bottom: 1px solid #eee;
+}
+
+.navbar .logo {
+  width: 150px;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+  color: #49557e;
+  font-size: 18px;
+  align-items: center;
+}
+
+/* make nav buttons behave like links */
+.nav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: lowercase;
+  padding: 0;
+}
+
+.nav-btn:hover {
+  opacity: 0.8;
+}
+
+.navbar .active {
+  padding-bottom: 2px;
+  border-bottom: 2px solid #49557e;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.navbar-right img {
+  cursor: pointer;
+}
+
+/* 🔍 search icon button */
+.search-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-btn img {
+  width: 22px;
+}
+
+/* ✅ Only style the Sign in button */
+.navbar .navbar-right > button:not(.hamburger-btn):not(.search-btn) {
+  background: transparent;
+  font-size: 16px;
+  color: #49557e;
+  border: 1px solid tomato;
+  padding: 10px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.navbar .navbar-right > button:not(.hamburger-btn):not(.search-btn):hover {
+  background: #fff4f2;
+}
+
+/* ---------------- Search bar ---------------- */
+.navbar-searchbar {
+  position: sticky;
+  top: 70px;
+  z-index: 4500;
+  background: white;
+  border-bottom: 1px solid #eee;
+  padding: 14px 0;
+}
+
+/* wrapper */
+.navbar-searchbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 14px;
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* input wrapper with icon */
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper img {
+  position: absolute;
+  left: 14px;
+  width: 18px;
+  opacity: 0.7;
+}
+
+.navbar-searchbar input {
+  width: 100%;
+  padding: 13px 42px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.navbar-searchbar input:focus {
+  border-color: tomato;
+  box-shadow: 0px 0px 0px 3px rgba(255, 99, 71, 0.15);
+}
+
+/* clear button */
+.clear-search-btn {
+  border: none;
+  background: #111;
+  color: white;
+  padding: 13px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.clear-search-btn:hover {
+  opacity: 0.9;
+}
+
+/* ---------------- Cart icon button ---------------- */
+.cart-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------------- Cart badge ---------------- */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: tomato;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* ---------------- Profile Dropdown ---------------- */
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+}
+
+.navbar-profile img {
+  width: 32px;
+  border-radius: 50%;
+}
+
+.nav-profile-dropdown {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.12);
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  z-index: 6000;
+}
+
+.nav-profile-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #49557e;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.nav-profile-dropdown li:hover {
+  background-color: #fff4f2;
+}
+
+.nav-profile-dropdown hr {
+  margin: 6px 0;
+  border: none;
+  height: 1px;
+  background: #eee;
+}
+
+/* ---------------- Floating Cart Button ---------------- */
+.floating-cart-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+
+  background: #111;
+  padding: 12px 14px;
+  border-radius: 50px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  z-index: 9999;
+  color: white;
+  font-weight: 700;
+
+  box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
+
+  border: none;
+  cursor: pointer;
+}
+
+.floating-cart-btn img {
+  width: 22px;
+  height: 22px;
+}
+
+.floating-cart-btn span {
+  font-size: 14px;
+}
+
+/* ---------------- MOBILE HAMBURGER BUTTON ---------------- */
+.hamburger-btn {
+  display: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 26px;
+  padding: 0;
+  color: #49557e;
+}
+
+/* ---------------- MOBILE MENU ---------------- */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 8000;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mobile-menu {
+  width: 260px;
+  height: 100%;
+  background: white;
+  padding: 22px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  box-shadow: -8px 0px 25px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-menu button {
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #49557e;
+  padding: 10px 6px;
+  border-radius: 10px;
+}
+
+.mobile-menu button:hover {
+  background: #fff4f2;
+}
+
+.mobile-menu button.active {
+  background: #fff4f2;
+  color: tomato;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 1050px) {
+  .navbar .logo {
+    width: 140px;
+  }
+
+  .navbar-menu {
+    gap: 20px;
+    font-size: 17px;
+  }
+
+  .navbar-right {
+    gap: 18px;
+  }
+
+  .navbar-right img {
+    width: 22px;
+  }
+
+  .navbar .navbar-right > button:not(.hamburger-btn):not(.search-btn) {
+    padding: 8px 25px;
+  }
+}
+
+@media (max-width: 900px) {
+  .navbar .logo {
+    width: 140px;
+  }
+
+  .navbar-menu {
+    gap: 15px;
+    font-size: 16px;
+  }
+
+  .navbar-right {
+    gap: 16px;
+  }
+
+  .navbar-right img {
+    width: 20px;
+  }
+
+  .navbar .navbar-right > button:not(.hamburger-btn):not(.search-btn) {
+    padding: 7px 20px;
+    font-size: 15px;
+  }
+}
+/* ---------------- Search suggestions dropdown ---------------- */
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper img {
+  position: absolute;
+  left: 14px;
+  width: 18px;
+  opacity: 0.7;
+}
+
+.navbar-searchbar input {
+  width: 100%;
+  padding: 13px 48px 13px 42px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-x-btn {
+  position: absolute;
+  right: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  color: #444;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.search-x-btn:hover {
+  background: #f4f4f4;
+}
+
+/* dropdown box */
+.search-suggestions {
+  max-width: 1100px;
+  margin: 10px auto 0 auto;
+  padding: 0 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-item {
+  width: 100%;
+  border: 1px solid #eee;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: 0.2s;
+}
+
+.suggestion-item:hover {
+  border-color: tomato;
+  background: #fff4f2;
+}
+
+.suggestion-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+
+.suggestion-category {
+  font-size: 13px;
+  color: #49557e;
+}
+
+.no-suggestion {
+  padding: 14px 12px;
+  background: #fff4f2;
+  border: 1px solid rgba(255, 99, 71, 0.25);
+  border-radius: 14px;
+  font-size: 14px;
+  color: #444;
+}
+
+@media (max-width: 750px) {
+  .navbar-menu {
+    display: none;
+  }
+
+  .hamburger-btn {
+    display: block;
+  }
+
+  .navbar-searchbar-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clear-search-btn {
+    width: 100%;
+  }
+}
