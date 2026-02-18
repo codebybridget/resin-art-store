@@ -96,7 +96,7 @@
 
 /* --- Switch between login/signup --- */
 .login-popup p span {
-  color: tomato;
+  color: pink;
   font-weight: 500;
   cursor: pointer;
 }
