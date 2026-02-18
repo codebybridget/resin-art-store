@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./List.css";
 import { toast } from "react-toastify";
-
-const ADMIN_TOKEN_KEY = "admin_token";
+import { useAdminAuth } from "../../context/AdminAuthContext";
 
 const List = ({ url }) => {
+  const { adminToken, logout } = useAdminAuth();
   const [items, setItems] = useState([]);
 
   // Fetch item list (public route)
@@ -32,9 +32,7 @@ const List = ({ url }) => {
   // Remove item (admin protected)
   const removeItem = async (id) => {
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      if (!token) {
+      if (!adminToken) {
         toast.error("Admin token missing. Please login again.");
         return;
       }
@@ -50,7 +48,7 @@ const List = ({ url }) => {
         { id },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         }
       );
@@ -63,6 +61,14 @@ const List = ({ url }) => {
       }
     } catch (error) {
       console.error("Error removing item:", error.response?.data || error);
+
+      // Auto logout if admin token is invalid
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        return;
+      }
+
       toast.error(error.response?.data?.message || "❌ Failed to remove item");
     }
   };
@@ -82,9 +88,8 @@ const List = ({ url }) => {
         </div>
 
         {items.map((item) => {
-          const imageUrl = item.image?.startsWith("http")
-            ? item.image
-            : `${url}/uploads/${item.image}`;
+          // ✅ Cloudinary URL is stored directly in DB now
+          const imageUrl = item.image;
 
           return (
             <div key={item._id} className="list-table-format">

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const ADMIN_TOKEN_KEY = "admin_token";
 
@@ -17,12 +17,30 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }, [adminToken]);
 
-  const login = (token) => setAdminToken(token);
+  const login = (token) => {
+    setAdminToken(token);
+  };
 
-  const logout = () => setAdminToken("");
+  const logout = () => {
+    setAdminToken("");
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+  };
+
+  // Always get the latest token (useful for axios calls)
+  const getToken = () => localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+
+  const value = useMemo(
+    () => ({
+      adminToken,
+      login,
+      logout,
+      getToken,
+    }),
+    [adminToken]
+  );
 
   return (
-    <AdminAuthContext.Provider value={{ adminToken, login, logout }}>
+    <AdminAuthContext.Provider value={value}>
       {children}
     </AdminAuthContext.Provider>
   );

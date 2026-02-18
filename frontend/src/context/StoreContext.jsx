@@ -3,10 +3,12 @@ import axios from "axios";
 
 export const StoreContext = createContext(null);
 
+// ✅ Keep this consistent everywhere
 const USER_TOKEN_KEY = "user_token";
 
 const StoreContextProvider = ({ children, setShowLogin }) => {
-  const url = import.meta.env.VITE_API_URL;
+  // Render/Vite environment variable
+  const url = import.meta.env.VITE_API_URL || "";
 
   const [cartItem, setCartItems] = useState({});
   const [item_list, setItemList] = useState([]);
@@ -32,29 +34,50 @@ const StoreContextProvider = ({ children, setShowLogin }) => {
 
   // ✅ ONE axios instance for the whole app
   const axiosInstance = useMemo(() => {
+    if (!url) {
+      console.error(
+        "❌ VITE_API_URL is missing. Please set it in Render frontend environment variables."
+      );
+    }
+
     const instance = axios.create({
-      baseURL: url,
+      baseURL: url || "http://localhost:5000",
       headers: { "Content-Type": "application/json" },
     });
 
-    // attach token
+    // Attach token
     instance.interceptors.request.use((config) => {
       const savedToken = localStorage.getItem(USER_TOKEN_KEY);
 
       if (savedToken) {
+        // Support both (your backend accepts both)
         config.headers.Authorization = `Bearer ${savedToken}`;
+        config.headers.token = savedToken;
       }
 
       return config;
     });
 
-    // auto logout if token expires
+    // Auto logout only on real auth failure
     instance.interceptors.response.use(
       (res) => res,
       (err) => {
         if (err.response?.status === 401) {
-          logoutUser();
+          // Don't logout on Paystack verify calls etc.
+          // Only logout if it's a user-auth route
+          const requestUrl = err.config?.url || "";
+
+          const shouldLogout =
+            requestUrl.includes("/api/cart") ||
+            requestUrl.includes("/api/order") ||
+            requestUrl.includes("/api/orders") ||
+            requestUrl.includes("/api/user");
+
+          if (shouldLogout) {
+            logoutUser();
+          }
         }
+
         return Promise.reject(err);
       }
     );

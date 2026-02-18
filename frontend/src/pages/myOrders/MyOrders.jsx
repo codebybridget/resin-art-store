@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../asset/assets";
 import "./MyOrders.css";
 
 const MyOrders = () => {
-  const { url, token, formatNaira } = useContext(StoreContext);
+  const { token, formatNaira, axiosInstance } = useContext(StoreContext);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,18 +15,14 @@ const MyOrders = () => {
       setLoading(true);
       setError("");
 
-      const res = await axios.post(
-        `${url}/api/orders/userorders`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // axiosInstance already attaches token automatically
+      const res = await axiosInstance.post("/api/order/userorders");
 
-      if (res.data.success) {
+      if (res.data?.success) {
         setOrders(res.data.orders || []);
       } else {
         setOrders([]);
+        setError(res.data?.message || "Failed to fetch orders");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch orders");
