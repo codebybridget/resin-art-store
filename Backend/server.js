@@ -23,8 +23,8 @@ const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
     origin: [
-      process.env.FRONTEND_URL,
-      process.env.ADMIN_URL,
+      "https://resin-art-store-frontend.onrender.com",
+      "https://resin-art-store-admin.onrender.com",
       "http://localhost:5173",
       "http://localhost:5174",
     ],
