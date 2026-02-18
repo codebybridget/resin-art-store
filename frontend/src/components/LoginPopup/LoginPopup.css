@@ -60,7 +60,7 @@
 }
 
 .login-popup-inputs input:focus {
-  border-color: tomato;
+  border-color: pink;
 }
 
 /* --- Button --- */
