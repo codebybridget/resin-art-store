@@ -20,14 +20,15 @@ export const addItem = async (req, res) => {
       });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // ✅ Cloudinary gives the full image URL
+    const imageUrl = req.file.path;
 
     const newItem = new Item({
       name,
       description,
       price: Number(price),
       category,
-      image: imageUrl,
+      image: imageUrl, // ✅ Save cloudinary URL
     });
 
     await newItem.save();
