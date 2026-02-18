@@ -36,9 +36,10 @@ const Add = ({ url }) => {
       return "Only JPG, JPEG, PNG, and WEBP images are allowed.";
     }
 
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // ✅ match backend (10MB)
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      return "Image is too large. Max allowed size is 5MB.";
+      return "Image is too large. Max allowed size is 10MB.";
     }
 
     return null;
@@ -95,7 +96,6 @@ const Add = ({ url }) => {
         toast.error(response.data.message || "Failed to add item");
       }
     } catch (error) {
-      // 🔥 This will show the exact backend error message
       const backendMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
