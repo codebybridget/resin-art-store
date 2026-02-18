@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -13,49 +15,59 @@ import orderRouter from "./routes/orderRouter.js";
 import paymentRouter from "./routes/paymentRouter.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
+const server = http.createServer(app);
 
-// Needed for __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ✅ CORS
-app.use(
-  cors({
+// ------------------ SOCKET.IO ------------------
+export const io = new Server(server, {
+  cors: {
     origin: [
       process.env.FRONTEND_URL,
       process.env.ADMIN_URL,
       "http://localhost:5173",
       "http://localhost:5174",
     ],
+    methods: ["GET", "POST"],
     credentials: true,
-  })
-);
+  },
+});
 
-// Routes
+io.on("connection", (socket) => {
+  console.log("✅ Admin/User connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("❌ Disconnected:", socket.id);
+  });
+});
+
+// ------------------ MIDDLEWARE ------------------
+app.use(express.json());
+app.use(cors());
+
+// ------------------ ROUTES ------------------
 app.use("/api/user", userRouter);
 app.use("/api/item", itemRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/payment", paymentRouter);
 
-// ✅ Serve uploads folder publicly
+// ------------------ UPLOADS (IMPORTANT FOR IMAGES) ------------------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Test route
+// ------------------ DEFAULT ROUTE ------------------
 app.get("/", (req, res) => {
   res.send("Resin Art Store Backend Running 🚀");
 });
 
-// Port
+// ------------------ DB + START ------------------
+connectDB();
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
