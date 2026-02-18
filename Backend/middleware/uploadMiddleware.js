@@ -4,12 +4,36 @@ import cloudinary from "../config/cloudinary.js";
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "resin-art-store",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  params: async (req, file) => {
+    return {
+      folder: "resin-art-store",
+      resource_type: "image",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      public_id: `${Date.now()}-${file.originalname
+        .split(".")[0]
+        .replace(/\s+/g, "-")
+        .toLowerCase()}`,
+    };
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+  if (!allowed.includes(file.mimetype)) {
+    return cb(
+      new Error("Only JPG, JPEG, PNG, and WEBP images are allowed."),
+      false
+    );
+  }
+
+  cb(null, true);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
 
 export default upload;

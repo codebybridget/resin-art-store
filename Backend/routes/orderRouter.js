@@ -14,17 +14,28 @@ import {
 const orderRouter = express.Router();
 
 /* -------------------- USER -------------------- */
+
+// Place order
 orderRouter.post("/place", authMiddleware, placeOrder);
+
+// Get user orders (your current route)
 orderRouter.post("/userorders", authMiddleware, userOrders);
 
+// Optional alias (in case frontend uses /myorders)
+orderRouter.get("/myorders", authMiddleware, userOrders);
+
 /* -------------------- ADMIN -------------------- */
+
+// List all orders
 orderRouter.get("/list", adminAuth, listOrders);
+
+// Update order status
 orderRouter.post("/status", adminAuth, updateStatus);
 
-// ✅ Delete one order
+// Delete one order
 orderRouter.post("/delete", adminAuth, deleteOrder);
 
-// ✅ Bulk delete unpaid orders older than X hours
+// Bulk delete unpaid orders older than X hours
 orderRouter.post("/delete-failed", adminAuth, deleteFailedOrders);
 
 export default orderRouter;
