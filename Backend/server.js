@@ -31,6 +31,16 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+app.get("/api/debug/cloudinary", (req, res) => {
+  return res.json({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || null,
+    api_key: process.env.CLOUDINARY_API_KEY
+      ? process.env.CLOUDINARY_API_KEY.slice(0, 6) + "****"
+      : null,
+    api_secret: process.env.CLOUDINARY_API_SECRET ? "SET" : null,
+  });
+});
+
 // ------------------ ALLOWED ORIGINS ------------------
 const allowedOrigins = [
   "https://resin-art-store-frontend.onrender.com",
