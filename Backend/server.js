@@ -31,6 +31,7 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+// ------------------ DEBUG ROUTE ------------------
 app.get("/api/debug/cloudinary", (req, res) => {
   return res.json({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME || null,
@@ -43,8 +44,15 @@ app.get("/api/debug/cloudinary", (req, res) => {
 
 // ------------------ ALLOWED ORIGINS ------------------
 const allowedOrigins = [
+  // ✅ Your custom domain
+  "https://ladybresinartgallery.com",
+  "https://www.ladybresinartgallery.com",
+
+  // Render domains (keep)
   "https://resin-art-store-frontend.onrender.com",
   "https://resin-art-store-admin.onrender.com",
+
+  // Local dev
   "http://localhost:5173",
   "http://localhost:5174",
 ];
