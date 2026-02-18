@@ -8,7 +8,7 @@ import { useAdminAuth } from "../../context/AdminAuthContext";
 const Add = ({ url }) => {
   const { adminToken } = useAdminAuth();
 
-  const [image, setImage] = useState(false);
+  const [image, setImage] = useState(null);
 
   const [data, setData] = useState({
     name: "",
@@ -22,6 +22,28 @@ const Add = ({ url }) => {
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validateImage = (file) => {
+    if (!file) return "Please upload an image.";
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      return "Only JPG, JPEG, PNG, and WEBP images are allowed.";
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return "Image is too large. Max allowed size is 5MB.";
+    }
+
+    return null;
+  };
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
@@ -30,22 +52,31 @@ const Add = ({ url }) => {
       return;
     }
 
-    if (!image) {
-      toast.error("Please upload an image.");
+    const imageError = validateImage(image);
+    if (imageError) {
+      toast.error(imageError);
+      return;
+    }
+
+    const priceNumber = Number(data.price);
+
+    if (!priceNumber || Number.isNaN(priceNumber) || priceNumber <= 0) {
+      toast.error("Please enter a valid price.");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description);
-      formData.append("price", Number(data.price));
+      formData.append("name", data.name.trim());
+      formData.append("description", data.description.trim());
+      formData.append("price", priceNumber);
       formData.append("category", data.category);
       formData.append("image", image);
 
       const response = await axios.post(`${url}/api/item/add`, formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -57,15 +88,23 @@ const Add = ({ url }) => {
           category: "Home Decor Resin",
         });
 
-        setImage(false);
+        setImage(null);
 
         toast.success(response.data.message || "Item added successfully!");
       } else {
         toast.error(response.data.message || "Failed to add item");
       }
     } catch (error) {
-      console.error("Upload failed:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Upload failed");
+      // 🔥 This will show the exact backend error message
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Upload failed";
+
+      console.error("❌ Upload failed:", error?.response?.data || error);
+
+      toast.error(backendMessage);
     }
   };
 
@@ -83,9 +122,13 @@ const Add = ({ url }) => {
           </label>
 
           <input
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              setImage(file || null);
+            }}
             type="file"
             id="image"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
             hidden
             required
           />

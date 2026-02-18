@@ -25,6 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ------------------ ENSURE UPLOADS FOLDER EXISTS ------------------
+// (Not needed for Cloudinary, but harmless + keeps old local support)
 const uploadPath = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
@@ -47,6 +48,9 @@ export const io = new Server(server, {
   },
 });
 
+// ✅ IMPORTANT: prevent circular import issues
+global.io = io;
+
 io.on("connection", (socket) => {
   console.log("✅ Admin/User connected:", socket.id);
 
@@ -57,13 +61,15 @@ io.on("connection", (socket) => {
 
 // ------------------ MIDDLEWARE ------------------
 app.use(express.json());
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "token"],
-}));
 
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "token"],
+  })
+);
 
 // ------------------ ROUTES ------------------
 app.use("/api/user", userRouter);

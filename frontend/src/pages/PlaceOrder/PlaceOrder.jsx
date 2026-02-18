@@ -126,13 +126,25 @@ const PlaceOrder = () => {
 
       setIsPlacingOrder(true);
 
-      // Create order (product total only)
-      const orderRes = await axiosInstance.post("/api/orders/place", {
-        items,
-        amount: total,
-        subtotalAmount: subtotal,
-        address,
-      });
+      // ✅ Always attach token (even if axiosInstance interceptor fails)
+      const authHeaders = {
+        headers: {
+          Authorization: `Bearer ${savedToken}`,
+        },
+      };
+
+      // Create order
+      // Use /api/order/place (real backend route)
+      const orderRes = await axiosInstance.post(
+        "/api/order/place",
+        {
+          items,
+          amount: total,
+          subtotalAmount: subtotal,
+          address,
+        },
+        authHeaders
+      );
 
       if (!orderRes.data?.success || !orderRes.data?.orderId) {
         alert(orderRes.data?.message || "❌ Failed to create order");
@@ -143,7 +155,11 @@ const PlaceOrder = () => {
       const orderId = orderRes.data.orderId;
 
       // Initialize Paystack transaction
-      const payRes = await axiosInstance.post("/api/payment/init", { orderId });
+      const payRes = await axiosInstance.post(
+        "/api/payment/init",
+        { orderId },
+        authHeaders
+      );
 
       if (!payRes.data?.success || !payRes.data?.authorization_url) {
         alert(payRes.data?.message || "❌ Failed to start payment");
@@ -154,8 +170,14 @@ const PlaceOrder = () => {
       // Redirect to Paystack checkout
       window.location.href = payRes.data.authorization_url;
     } catch (err) {
-      console.error("Place order error:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "❌ Failed to place order");
+      console.error("❌ Place order error:", err?.response?.data || err);
+
+      alert(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "❌ Failed to place order"
+      );
+
       setIsPlacingOrder(false);
     }
   };

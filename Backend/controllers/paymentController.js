@@ -1,7 +1,17 @@
 import axios from "axios";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
-import { io } from "../server.js";
+
+/* -------------------- SOCKET EMIT SAFE -------------------- */
+const emitRefreshOrders = () => {
+  try {
+    if (global.io) {
+      global.io.emit("refreshOrders");
+    }
+  } catch (err) {
+    console.error("Socket emit error:", err.message);
+  }
+};
 
 /* -------------------- PAYSTACK HELPERS -------------------- */
 const getPaystackSecret = () => process.env.PAYSTACK_SECRET_KEY || "";
@@ -14,12 +24,19 @@ export const initPaystackPayment = async (req, res) => {
     if (!paystackSecret) {
       return res.status(500).json({
         success: false,
-        message: "Paystack secret key missing in .env",
+        message: "PAYSTACK_SECRET_KEY missing in environment variables",
       });
     }
 
-    const userId = req.user.id;
+    const userId = req?.user?.id;
     const { orderId } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Please login again.",
+      });
+    }
 
     if (!orderId) {
       return res.status(400).json({
@@ -47,7 +64,7 @@ export const initPaystackPayment = async (req, res) => {
 
     // Prevent re-payment
     if (order.payment === true) {
-      return res.json({
+      return res.status(200).json({
         success: true,
         message: "Order already paid",
         authorization_url: null,
@@ -58,21 +75,31 @@ export const initPaystackPayment = async (req, res) => {
     // Get the user's real email
     const user = await userModel.findById(userId);
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const amountInKobo = Math.round(Number(order.totalAmount || 0) * 100);
 
-    if (!amountInKobo || amountInKobo <= 0) {
+    if (!amountInKobo || Number.isNaN(amountInKobo) || amountInKobo <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid order amount",
       });
     }
 
-    const callbackUrl = `${process.env.FRONTEND_URL}/payment-success`;
+    const frontendUrl =
+      process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const callbackUrl = `${frontendUrl}/payment-success`;
 
     const response = await axios.post(
       "https://api.paystack.co/transaction/initialize",
       {
-        email: user?.email || "test@email.com",
+        email: user.email,
         amount: amountInKobo,
         callback_url: callbackUrl,
         metadata: {
@@ -101,7 +128,7 @@ export const initPaystackPayment = async (req, res) => {
     order.reference = paystackData.reference;
     await order.save();
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       authorization_url: paystackData.authorization_url,
       reference: paystackData.reference,
@@ -114,13 +141,19 @@ export const initPaystackPayment = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.response?.data?.message || "Payment init failed",
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.data?.message ||
+        "Payment init failed",
     });
   }
 };
 
 /* -------------------- VERIFY PAYSTACK PAYMENT -------------------- */
-/** This route should NOT require auth, because Paystack sometimes redirects without token. */
+/**
+ * This route should NOT require auth,
+ * because Paystack redirect does not include your JWT.
+ */
 export const verifyPaystackPayment = async (req, res) => {
   try {
     const paystackSecret = getPaystackSecret();
@@ -128,7 +161,7 @@ export const verifyPaystackPayment = async (req, res) => {
     if (!paystackSecret) {
       return res.status(500).json({
         success: false,
-        message: "Paystack secret key missing in .env",
+        message: "PAYSTACK_SECRET_KEY missing in environment variables",
       });
     }
 
@@ -161,7 +194,7 @@ export const verifyPaystackPayment = async (req, res) => {
     }
 
     if (data.status !== "success") {
-      return res.json({
+      return res.status(200).json({
         success: false,
         message: "Payment not successful",
       });
@@ -180,7 +213,7 @@ export const verifyPaystackPayment = async (req, res) => {
     const order = await orderModel.findById(orderId);
 
     if (!order) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Order not found",
       });
@@ -188,7 +221,7 @@ export const verifyPaystackPayment = async (req, res) => {
 
     // Prevent double verification
     if (order.payment === true) {
-      return res.json({
+      return res.status(200).json({
         success: true,
         message: "Already verified",
         order,
@@ -204,23 +237,26 @@ export const verifyPaystackPayment = async (req, res) => {
     // Clear user cart after successful payment
     await userModel.findByIdAndUpdate(order.userId, { cartData: {} });
 
-    // ✅ IMPORTANT: Tell admin panel to refresh instantly
-    io.emit("refreshOrders");
+    // Tell admin panel to refresh instantly
+    emitRefreshOrders();
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
       order,
     });
   } catch (error) {
     console.error(
-      "Paystack verify error:",
+      "🔥 Paystack verify error:",
       error.response?.data || error.message
     );
 
     return res.status(500).json({
       success: false,
-      message: error.response?.data?.message || "Payment verification failed",
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.data?.message ||
+        "Payment verification failed",
     });
   }
 };
