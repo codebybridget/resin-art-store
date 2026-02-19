@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import "./CartDrawer.css";
 import { StoreContext } from "../../context/StoreContext";
-import { sizeExtra } from "../../data/resinOptions";
+import { sizeMultiplier } from "../../data/resinOptions";
 import { useNavigate } from "react-router-dom";
 
 const CartDrawer = ({ isOpen, onClose }) => {
@@ -27,8 +27,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
       const normalizedCategory = row.category?.trim().toLowerCase() || "";
       const isHomeDecor = normalizedCategory === "home decor resin";
 
+      // ✅ MULTIPLIER PRICING
       const finalPrice = isHomeDecor
-        ? Number(item.price) + sizeExtra(row.size)
+        ? Number(item.price) * sizeMultiplier(row.size)
         : Number(item.price);
 
       total += finalPrice * Number(row.quantity || 0);
@@ -79,17 +80,23 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 );
                 if (!item) return null;
 
-                const imageUrl = item.image
-                  ? item.image.startsWith("http")
-                    ? item.image
-                    : `${url}/uploads/${item.image}`
-                  : "";
+                // ✅ FIX IMAGE: now items use images[]
+                const imageUrl =
+                  Array.isArray(item.images) && item.images.length > 0
+                    ? item.images[0]
+                    : item.image
+                    ? item.image.startsWith("http")
+                      ? item.image
+                      : `${url}/uploads/${item.image}`
+                    : "";
 
-                const normalizedCategory = row.category?.trim().toLowerCase() || "";
+                const normalizedCategory =
+                  row.category?.trim().toLowerCase() || "";
                 const isHomeDecor = normalizedCategory === "home decor resin";
 
+                // ✅ MULTIPLIER PRICING
                 const finalPrice = isHomeDecor
-                  ? Number(item.price) + sizeExtra(row.size)
+                  ? Number(item.price) * sizeMultiplier(row.size)
                   : Number(item.price);
 
                 return (
