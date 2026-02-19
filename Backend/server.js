@@ -25,7 +25,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ------------------ ENSURE UPLOADS FOLDER EXISTS ------------------
-// (Not needed for Cloudinary, but harmless)
 const uploadPath = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
@@ -44,34 +43,28 @@ app.get("/api/debug/cloudinary", (req, res) => {
 
 // ------------------ ALLOWED ORIGINS ------------------
 const allowedOrigins = [
-  // ✅ Custom domain (frontend)
   "https://ladybresinartgallery.com",
   "https://www.ladybresinartgallery.com",
 
-  // ✅ Admin Render domain
   "https://resin-art-store-admin.onrender.com",
-
-  // ✅ Frontend Render domain
   "https://resin-art-store-frontend.onrender.com",
 
-  // Local dev
   "http://localhost:5173",
   "http://localhost:5174",
 ];
 
-// ------------------ CORS FUNCTION (IMPORTANT FIX) ------------------
+// ------------------ CORS OPTIONS ------------------
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (Postman, server-to-server, mobile apps)
+    // Allow Postman / server-to-server
     if (!origin) return callback(null, true);
 
     // Allow exact matches
     if (allowedOrigins.includes(origin)) return callback(null, true);
 
-    // ✅ Allow any Render subdomain (VERY IMPORTANT)
+    // Allow any Render subdomain
     if (origin.endsWith(".onrender.com")) return callback(null, true);
 
-    // Block everything else
     return callback(new Error("CORS blocked for origin: " + origin), false);
   },
   credentials: true,
@@ -84,7 +77,7 @@ export const io = new Server(server, {
   cors: corsOptions,
 });
 
-// Prevent circular import issues
+// prevent circular import issues
 global.io = io;
 
 io.on("connection", (socket) => {
@@ -99,8 +92,13 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Handle preflight properly
-app.options("*", cors(corsOptions));
+// ✅ FIX: Handle preflight without using app.options("*")
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return cors(corsOptions)(req, res, next);
+  }
+  next();
+});
 
 // ------------------ ROUTES ------------------
 app.use("/api/user", userRouter);
@@ -110,7 +108,7 @@ app.use("/api/cart", cartRouter);
 // Main route
 app.use("/api/order", orderRouter);
 
-// Compatibility alias (fixes frontend calling /api/orders/*)
+// Compatibility alias
 app.use("/api/orders", orderRouter);
 
 app.use("/api/payment", paymentRouter);
