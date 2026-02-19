@@ -24,29 +24,38 @@ const ProductDetails = () => {
     loading,
   } = useContext(StoreContext);
 
-  const product = useMemo(() => {
-    return item_list.find((item) => String(item?._id) === String(id));
-  }, [item_list, id]);
+  const product = item_list.find((item) => String(item?._id) === String(id));
 
-  const [selectedImage, setSelectedImage] = useState(assets.placeholder);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [qty, setQty] = useState(1);
 
-  // Safe product values
-  const name = product?.name || "";
-  const price = product?.price || 0;
-  const description = product?.description || "";
-  const category = product?.category || "";
-  const images = product?.images || [];
+  // If items are still loading
+  if (loading) {
+    return <div style={{ padding: "30px" }}>Loading product...</div>;
+  }
+
+  // If product not found
+  if (!product) {
+    return (
+      <div style={{ padding: "30px" }}>
+        <h2>Product not found</h2>
+        <button onClick={() => navigate("/")}>Go back</button>
+      </div>
+    );
+  }
+
+  const { name, price, description, category, images = [] } = product;
 
   const safeImages = Array.isArray(images) ? images : [];
 
-  // Set default selected image safely
+  // ✅ Set default selected image safely
   useEffect(() => {
     if (safeImages.length > 0) {
       setSelectedImage(safeImages[0]);
     } else {
       setSelectedImage(assets.placeholder);
     }
-  }, [id, safeImages]);
+  }, [product]);
 
   const sizes = useMemo(() => getSizesForCategory(category), [category]);
 
@@ -60,6 +69,7 @@ const ProductDetails = () => {
   }, [sizes]);
 
   const normalizedCategory = category?.trim().toLowerCase() || "";
+
   const showSize = normalizedCategory === "home decor resin";
   const showCustomText = isCustomizationCategory(category);
 
@@ -72,31 +82,19 @@ const ProductDetails = () => {
   const safeCustomText = showCustomText ? customText.trim() : "";
 
   const cartKey = `${id}_${color1}_${color2}_${safeSize}_${safeCustomText}`;
-  const qty = cartItem?.[cartKey]?.quantity || 0;
+  const cartQty = cartItem?.[cartKey]?.quantity || 0;
 
   const addItemToCart = () => {
-    addToCart(cartKey, id, {
-      color1,
-      color2,
-      size: safeSize,
-      customText: safeCustomText,
-      category,
-    });
+    for (let i = 0; i < qty; i++) {
+      addToCart(cartKey, id, {
+        color1,
+        color2,
+        size: safeSize,
+        customText: safeCustomText,
+        category,
+      });
+    }
   };
-
-  // ✅ Now return safely (no hooks below)
-  if (loading) {
-    return <div style={{ padding: "30px" }}>Loading product...</div>;
-  }
-
-  if (!product) {
-    return (
-      <div style={{ padding: "30px" }}>
-        <h2>Product not found</h2>
-        <button onClick={() => navigate("/")}>Go back</button>
-      </div>
-    );
-  }
 
   return (
     <div className="product-page">
@@ -104,44 +102,53 @@ const ProductDetails = () => {
         ← Back
       </button>
 
-      <div className="product-container">
-        {/* LEFT: GALLERY */}
-        <div className="product-gallery">
-          <div className="product-image-box">
-            <img src={selectedImage} alt={name} />
-          </div>
-
-          {/* THUMBNAILS */}
-          {safeImages.length > 1 && (
-            <div className="product-thumbnails">
-              {safeImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`thumb-${index}`}
-                  className={selectedImage === img ? "active" : ""}
-                  onClick={() => setSelectedImage(img)}
-                />
-              ))}
-            </div>
+      <div className="temu-product-layout">
+        {/* LEFT: THUMBNAILS */}
+        <div className="temu-thumbs">
+          {safeImages.length > 0 ? (
+            safeImages.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`thumb-${index}`}
+                className={selectedImage === img ? "active" : ""}
+                onClick={() => setSelectedImage(img)}
+              />
+            ))
+          ) : (
+            <img
+              src={assets.placeholder}
+              alt="thumb-placeholder"
+              className="active"
+            />
           )}
         </div>
 
-        {/* RIGHT: INFO */}
-        <div className="product-info">
-          <h2>{name}</h2>
+        {/* MIDDLE: MAIN IMAGE */}
+        <div className="temu-main-image">
+          <img src={selectedImage} alt={name} />
+        </div>
 
-          <p className="product-price">{formatNaira(finalPrice)}</p>
+        {/* RIGHT: PRODUCT INFO */}
+        <div className="temu-info">
+          <h2 className="temu-title">{name}</h2>
 
-          <p className="product-category">{category}</p>
+          <div className="temu-rating">
+            <img src={assets.rating_starts} alt="rating" />
+            <span>4.7</span>
+          </div>
 
-          <p className="product-desc">{description}</p>
+          <p className="temu-price">{formatNaira(finalPrice)}</p>
 
-          {/* CUSTOMIZATION BOX */}
-          <div className="customize-box">
+          <p className="temu-category">{category}</p>
+
+          <p className="temu-desc">{description}</p>
+
+          {/* OPTIONS */}
+          <div className="temu-options-box">
             <h3>Choose Options</h3>
 
-            <div className="customize-row">
+            <div className="temu-option-row">
               <label>Color 1:</label>
               <select value={color1} onChange={(e) => setColor1(e.target.value)}>
                 {resinColors.map((c) => (
@@ -152,7 +159,7 @@ const ProductDetails = () => {
               </select>
             </div>
 
-            <div className="customize-row">
+            <div className="temu-option-row">
               <label>Color 2:</label>
               <select value={color2} onChange={(e) => setColor2(e.target.value)}>
                 {resinColors.map((c) => (
@@ -164,7 +171,7 @@ const ProductDetails = () => {
             </div>
 
             {showSize && (
-              <div className="customize-row">
+              <div className="temu-option-row">
                 <label>Size:</label>
                 <select value={size} onChange={(e) => setSize(e.target.value)}>
                   {sizes.map((s) => (
@@ -177,7 +184,7 @@ const ProductDetails = () => {
             )}
 
             {showCustomText && (
-              <div className="customize-row">
+              <div className="temu-option-row">
                 <label>Custom Text:</label>
                 <input
                   type="text"
@@ -187,22 +194,32 @@ const ProductDetails = () => {
                 />
               </div>
             )}
+
+            {/* QTY DROPDOWN */}
+            <div className="temu-option-row">
+              <label>Qty:</label>
+              <select value={qty} onChange={(e) => setQty(Number(e.target.value))}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* CART ACTIONS */}
-          <div className="cart-actions">
-            {!qty ? (
-              <button className="add-btn" onClick={addItemToCart}>
-                Add to Cart
-              </button>
-            ) : (
-              <div className="qty-box">
-                <button onClick={() => removeFromCart(cartKey)}>-</button>
-                <span>{qty}</span>
-                <button onClick={addItemToCart}>+</button>
-              </div>
-            )}
-          </div>
+          {/* CART BUTTON */}
+          {!cartQty ? (
+            <button className="temu-add-btn" onClick={addItemToCart}>
+              Add to Cart
+            </button>
+          ) : (
+            <div className="qty-box">
+              <button onClick={() => removeFromCart(cartKey)}>-</button>
+              <span>{cartQty}</span>
+              <button onClick={() => addToCart(cartKey, id)}>+</button>
+            </div>
+          )}
         </div>
       </div>
     </div>
