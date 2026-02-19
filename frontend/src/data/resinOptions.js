@@ -45,6 +45,18 @@ export const sizeMultiplier = (size) => {
   return 1;
 };
 
+/**
+ * ✅ BACKWARD COMPATIBILITY
+ * Some files still import sizeExtra.
+ * We'll keep it so builds don't fail.
+ *
+ * sizeExtra returns the EXTRA AMOUNT, not multiplier.
+ */
+export const sizeExtra = (size, basePrice = 0) => {
+  const multiplier = sizeMultiplier(size);
+  return Number(basePrice) * (multiplier - 1);
+};
+
 // Check if category supports custom text
 export const isCustomizationCategory = (category) => {
   const cat = category?.trim().toLowerCase();
