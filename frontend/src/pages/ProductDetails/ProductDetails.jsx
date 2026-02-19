@@ -24,37 +24,29 @@ const ProductDetails = () => {
     loading,
   } = useContext(StoreContext);
 
-  const product = item_list.find((item) => String(item?._id) === String(id));
+  const product = useMemo(() => {
+    return item_list.find((item) => String(item?._id) === String(id));
+  }, [item_list, id]);
 
-  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(assets.placeholder);
 
-  // If items are still loading
-  if (loading) {
-    return <div style={{ padding: "30px" }}>Loading product...</div>;
-  }
-
-  // If product not found
-  if (!product) {
-    return (
-      <div style={{ padding: "30px" }}>
-        <h2>Product not found</h2>
-        <button onClick={() => navigate("/")}>Go back</button>
-      </div>
-    );
-  }
-
-  const { name, price, description, category, images = [] } = product;
+  // Safe product values
+  const name = product?.name || "";
+  const price = product?.price || 0;
+  const description = product?.description || "";
+  const category = product?.category || "";
+  const images = product?.images || [];
 
   const safeImages = Array.isArray(images) ? images : [];
 
-  // ✅ Set default selected image safely
+  // Set default selected image safely
   useEffect(() => {
     if (safeImages.length > 0) {
       setSelectedImage(safeImages[0]);
     } else {
       setSelectedImage(assets.placeholder);
     }
-  }, [id, safeImages.length]);
+  }, [id, safeImages]);
 
   const sizes = useMemo(() => getSizesForCategory(category), [category]);
 
@@ -68,13 +60,13 @@ const ProductDetails = () => {
   }, [sizes]);
 
   const normalizedCategory = category?.trim().toLowerCase() || "";
-
   const showSize = normalizedCategory === "home decor resin";
   const showCustomText = isCustomizationCategory(category);
 
-  // ✅ FINAL PRICE: multiplier for Home Decor Resin
-  const basePrice = Number(price) || 0;
-  const finalPrice = showSize ? basePrice * sizeMultiplier(size) : basePrice;
+  // ✅ MULTIPLIER PRICING
+  const finalPrice = showSize
+    ? Number(price) * sizeMultiplier(size)
+    : Number(price);
 
   const safeSize = showSize ? size : "One Size";
   const safeCustomText = showCustomText ? customText.trim() : "";
@@ -91,6 +83,20 @@ const ProductDetails = () => {
       category,
     });
   };
+
+  // ✅ Now return safely (no hooks below)
+  if (loading) {
+    return <div style={{ padding: "30px" }}>Loading product...</div>;
+  }
+
+  if (!product) {
+    return (
+      <div style={{ padding: "30px" }}>
+        <h2>Product not found</h2>
+        <button onClick={() => navigate("/")}>Go back</button>
+      </div>
+    );
+  }
 
   return (
     <div className="product-page">
