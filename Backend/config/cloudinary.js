@@ -16,6 +16,7 @@ cloudinary.config({
   cloud_name: cloudName,
   api_key: apiKey,
   api_secret: apiSecret,
+  secure: true, // ✅ Always return https URLs
 });
 
 export default cloudinary;

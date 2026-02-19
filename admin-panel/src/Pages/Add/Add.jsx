@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Add.css";
 import { assets } from "../../assets/assets";
 import axios from "axios";
@@ -8,7 +8,9 @@ import { useAdminAuth } from "../../context/AdminAuthContext";
 const Add = ({ url }) => {
   const { adminToken } = useAdminAuth();
 
-  const [image, setImage] = useState(null);
+  // ✅ MULTIPLE IMAGES
+  const [images, setImages] = useState([]);
+  const fileInputRef = useRef(null);
 
   const [data, setData] = useState({
     name: "",
@@ -22,8 +24,9 @@ const Add = ({ url }) => {
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateImage = (file) => {
-    if (!file) return "Please upload an image.";
+  const validateImages = (files) => {
+    if (!files || files.length === 0) return "Please upload at least 1 image.";
+    if (files.length > 6) return "You can upload maximum 6 images.";
 
     const allowedTypes = [
       "image/jpeg",
@@ -32,17 +35,23 @@ const Add = ({ url }) => {
       "image/webp",
     ];
 
-    if (!allowedTypes.includes(file.type)) {
-      return "Only JPG, JPEG, PNG, and WEBP images are allowed.";
-    }
+    const maxSize = 10 * 1024 * 1024; // 10MB per image
 
-    // ✅ match backend (10MB)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return "Image is too large. Max allowed size is 10MB.";
+    for (let file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        return "Only JPG, JPEG, PNG, and WEBP images are allowed.";
+      }
+
+      if (file.size > maxSize) {
+        return "One of the images is too large. Max allowed size is 10MB.";
+      }
     }
 
     return null;
+  };
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmitHandler = async (event) => {
@@ -53,7 +62,7 @@ const Add = ({ url }) => {
       return;
     }
 
-    const imageError = validateImage(image);
+    const imageError = validateImages(images);
     if (imageError) {
       toast.error(imageError);
       return;
@@ -72,7 +81,11 @@ const Add = ({ url }) => {
       formData.append("description", data.description.trim());
       formData.append("price", priceNumber);
       formData.append("category", data.category);
-      formData.append("image", image);
+
+      // ✅ SEND MULTIPLE IMAGES
+      images.forEach((file) => {
+        formData.append("images", file);
+      });
 
       const response = await axios.post(`${url}/api/item/add`, formData, {
         headers: {
@@ -89,7 +102,12 @@ const Add = ({ url }) => {
           category: "Home Decor Resin",
         });
 
-        setImage(null);
+        setImages([]);
+
+        // ✅ reset input so you can upload same images again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
 
         toast.success(response.data.message || "Item added successfully!");
       } else {
@@ -112,26 +130,89 @@ const Add = ({ url }) => {
     <div className="add">
       <form className="flex-col" onSubmit={onSubmitHandler}>
         <div className="add-img-upload flex-col">
-          <p>Upload Image</p>
+          <p>Upload Images (1 - 6)</p>
 
-          <label htmlFor="image">
+          <label htmlFor="images">
             <img
-              src={image ? URL.createObjectURL(image) : assets.upload_area}
+              src={
+                images.length > 0
+                  ? URL.createObjectURL(images[0])
+                  : assets.upload_area
+              }
               alt="preview"
             />
           </label>
 
           <input
+            ref={fileInputRef}
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              setImage(file || null);
+              const files = Array.from(e.target.files || []);
+              setImages(files);
             }}
             type="file"
-            id="image"
+            id="images"
             accept="image/png,image/jpeg,image/jpg,image/webp"
+            multiple
             hidden
             required
           />
+
+          {/* ✅ PREVIEW ALL IMAGES */}
+          {images.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                marginTop: "15px",
+              }}
+            >
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  style={{
+                    position: "relative",
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    border: "1px solid #ddd",
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(img)}
+                    alt={`preview-${index}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "red",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "22px",
+                      height: "22px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="add-product-name flex-col">

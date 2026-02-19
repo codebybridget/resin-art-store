@@ -21,6 +21,7 @@ const Orders = ({ url }) => {
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
+      withCredentials: true,
     };
   };
 
@@ -51,11 +52,12 @@ const Orders = ({ url }) => {
     fetchAllOrders();
   }, [adminToken]);
 
-  // Socket: refresh orders when new order comes in
+  // ✅ Socket: refresh orders when new order comes in
   useEffect(() => {
     if (!adminToken) return;
 
     const socket = io(url, {
+      transports: ["websocket"],
       auth: { token: adminToken },
     });
 
@@ -65,6 +67,10 @@ const Orders = ({ url }) => {
 
     socket.on("refreshOrders", () => {
       fetchAllOrders();
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ Socket disconnected");
     });
 
     return () => socket.disconnect();

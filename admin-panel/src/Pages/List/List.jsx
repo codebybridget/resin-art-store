@@ -88,12 +88,26 @@ const List = ({ url }) => {
         </div>
 
         {items.map((item) => {
-          // ✅ Cloudinary URL is stored directly in DB now
-          const imageUrl = item.image;
+          // ✅ FIX: support both old + new items
+          const imageUrl =
+            Array.isArray(item.images) && item.images.length > 0
+              ? item.images[0]
+              : item.image || "";
 
           return (
             <div key={item._id} className="list-table-format">
-              <img src={imageUrl} alt={item.name} />
+              {imageUrl ? (
+                <img src={imageUrl} alt={item.name} />
+              ) : (
+                <div
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "10px",
+                    background: "#eee",
+                  }}
+                />
+              )}
 
               <p>{item.name}</p>
               <p>{item.description}</p>

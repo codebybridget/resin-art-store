@@ -1,34 +1,38 @@
 import Item from "../models/itemModel.js";
+import cloudinary from "../config/cloudinary.js";
 
-// ADD ITEM
+// ADD ITEM (MULTIPLE IMAGES)
 export const addItem = async (req, res) => {
   try {
     const { name, description, price, category } = req.body;
 
     // Validate required fields
-    if (!name || !description || !price) {
+    if (!name || !description || !price || !category) {
       return res.status(400).json({
         success: false,
-        message: "Name, description, and price are required",
+        message: "Name, description, price, and category are required",
       });
     }
 
-    if (!req.file) {
+    // ✅ multer multiple files: req.files
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Image is required",
+        message: "At least one image is required",
       });
     }
 
-    // ✅ Cloudinary gives the full image URL
-    const imageUrl = req.file.path;
+    // Cloudinary file info
+    const images = req.files.map((file) => file.path);
+    const cloudinaryIds = req.files.map((file) => file.filename);
 
     const newItem = new Item({
       name,
       description,
       price: Number(price),
       category,
-      image: imageUrl, // ✅ Save cloudinary URL
+      images,
+      cloudinaryIds,
     });
 
     await newItem.save();
@@ -39,7 +43,7 @@ export const addItem = async (req, res) => {
       item: newItem,
     });
   } catch (error) {
-    console.error("Error adding item:", error.message);
+    console.error("Error adding item:", error);
 
     return res.status(500).json({
       success: false,
@@ -58,7 +62,7 @@ export const listItems = async (req, res) => {
       items,
     });
   } catch (error) {
-    console.error("Error listing items:", error.message);
+    console.error("Error listing items:", error);
 
     return res.status(500).json({
       success: false,
@@ -86,7 +90,7 @@ export const getItemById = async (req, res) => {
       item,
     });
   } catch (error) {
-    console.error("Error fetching item:", error.message);
+    console.error("Error fetching item:", error);
 
     return res.status(500).json({
       success: false,
@@ -95,26 +99,39 @@ export const getItemById = async (req, res) => {
   }
 };
 
-// REMOVE ITEM
+// REMOVE ITEM (DELETE CLOUDINARY IMAGES TOO)
 export const removeItem = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const deleted = await Item.findByIdAndDelete(id);
+    const item = await Item.findById(id);
 
-    if (!deleted) {
+    if (!item) {
       return res.status(404).json({
         success: false,
         message: "Item not found",
       });
     }
 
+    // ✅ Delete images from Cloudinary
+    if (item.cloudinaryIds && item.cloudinaryIds.length > 0) {
+      for (const publicId of item.cloudinaryIds) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+          console.log("⚠️ Cloudinary delete failed:", publicId, err.message);
+        }
+      }
+    }
+
+    await Item.findByIdAndDelete(id);
+
     return res.json({
       success: true,
       message: "Item removed successfully",
     });
   } catch (error) {
-    console.error("Error removing item:", error.message);
+    console.error("Error removing item:", error);
 
     return res.status(500).json({
       success: false,

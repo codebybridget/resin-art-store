@@ -4,11 +4,17 @@ import { StoreContext } from "../../context/StoreContext";
 import FullItem from "../FullItem/FullItem";
 
 const ItemDisplay = ({ category }) => {
-  const { item_list = [], loading, error, searchText } = useContext(StoreContext);
+  const {
+    item_list = [],
+    loading,
+    error,
+    searchText,
+  } = useContext(StoreContext);
 
   if (loading) return <div style={{ padding: "20px" }}>Loading items...</div>;
   if (error) return <div style={{ padding: "20px" }}>Error: {error}</div>;
-  if (!item_list.length) return <div style={{ padding: "20px" }}>No items available yet.</div>;
+  if (!item_list.length)
+    return <div style={{ padding: "20px" }}>No items available yet.</div>;
 
   const normalize = (str) => String(str || "").trim().toLowerCase();
   const selectedCategory = normalize(category || "all");
@@ -46,8 +52,8 @@ const ItemDisplay = ({ category }) => {
         <div className="no-items-box">
           <h3>No results found</h3>
           <p>
-            We couldn’t find anything for <b>"{searchText}"</b>.  
-            Try searching another name.
+            We couldn’t find anything for <b>"{searchText}"</b>. Try searching
+            another name.
           </p>
         </div>
       </div>
@@ -56,7 +62,9 @@ const ItemDisplay = ({ category }) => {
 
   return (
     <div className="item-display">
-      <h2>{search ? `Search results for "${searchText}"` : "Top items for you"}</h2>
+      <h2>
+        {search ? `Search results for "${searchText}"` : "Top items for you"}
+      </h2>
 
       <div className="item-display-list">
         {itemsToDisplay.map((item) => (
@@ -66,7 +74,7 @@ const ItemDisplay = ({ category }) => {
             name={item.name}
             description={item.description}
             price={item.price}
-            image={item.image}
+            images={item.images}
             category={item.category}
           />
         ))}

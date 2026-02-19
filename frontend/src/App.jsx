@@ -13,6 +13,9 @@ import MyOrders from "./pages/myOrders/MyOrders";
 import PaymentSuccess from "./pages/paymentSuccess/paymentSuccess.jsx";
 import PaymentCancel from "./pages/paymentCancel/paymentCancel.jsx";
 
+// ✅ NEW PRODUCT DETAILS PAGE
+import ProductDetails from "./pages/ProductDetails/ProductDetails.jsx";
+
 import StoreContextProvider from "./context/StoreContext.jsx";
 
 import { ToastContainer } from "react-toastify";
@@ -30,6 +33,10 @@ const App = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
+
+          {/* ✅ NEW PRODUCT DETAILS ROUTE */}
+          <Route path="/product/:id" element={<ProductDetails />} />
+
           <Route path="/cart" element={<Cart />} />
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/myorders" element={<MyOrders />} />

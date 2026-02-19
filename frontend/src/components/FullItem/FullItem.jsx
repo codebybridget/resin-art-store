@@ -2,6 +2,7 @@ import React, { useContext, useMemo, useState, useEffect } from "react";
 import "./FullItem.css";
 import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../asset/assets";
+import { useNavigate } from "react-router-dom";
 
 import {
   resinColors,
@@ -10,8 +11,10 @@ import {
   isCustomizationCategory,
 } from "../../data/resinOptions";
 
-const FullItem = ({ id, name, price, description, image, category }) => {
-  const { cartItem, addToCart, removeFromCart, url, formatNaira } =
+const FullItem = ({ id, name, price, description, images = [], category }) => {
+  const navigate = useNavigate();
+
+  const { cartItem, addToCart, removeFromCart, formatNaira } =
     useContext(StoreContext);
 
   const sizes = useMemo(() => getSizesForCategory(category), [category]);
@@ -21,37 +24,30 @@ const FullItem = ({ id, name, price, description, image, category }) => {
   const [size, setSize] = useState(sizes?.[0] || "One Size");
   const [customText, setCustomText] = useState("");
 
-  // Reset size when category changes
   useEffect(() => {
     setSize(sizes?.[0] || "One Size");
   }, [sizes]);
 
-  const imageUrl = image
-    ? image.startsWith("http")
-      ? image
-      : `${url}/uploads/${image}`
-    : assets.placeholder;
+  // ✅ FIX: If images is missing, fallback to placeholder
+  const imageUrl =
+    Array.isArray(images) && images.length > 0 ? images[0] : assets.placeholder;
 
   const normalizedCategory = category?.trim().toLowerCase() || "";
 
   const showSize = normalizedCategory === "home decor resin";
   const showCustomText = isCustomizationCategory(category);
 
-  // Price changes only for Home Decor Resin
   const finalPrice = showSize ? Number(price) + sizeExtra(size) : Number(price);
 
-  // ✅ Only include size if category supports it
   const safeSize = showSize ? size : "One Size";
-
-  // ✅ Only include customText if category supports it
   const safeCustomText = showCustomText ? customText.trim() : "";
 
-  // ✅ Stable cartKey
   const cartKey = `${id}_${color1}_${color2}_${safeSize}_${safeCustomText}`;
-
   const qty = cartItem?.[cartKey]?.quantity || 0;
 
-  const addItemToCart = () => {
+  const addItemToCart = (e) => {
+    e.stopPropagation();
+
     addToCart(cartKey, id, {
       color1,
       color2,
@@ -61,34 +57,20 @@ const FullItem = ({ id, name, price, description, image, category }) => {
     });
   };
 
-  return (
-    // ✅ IMPORTANT: this id makes search suggestions scroll to the product
-    <div className="full-item" id={`item-${id}`}>
-      <div className="full-item-img-container">
-        <img className="full-item-image" src={imageUrl} alt={name} />
+  const removeItemFromCart = (e) => {
+    e.stopPropagation();
+    removeFromCart(cartKey);
+  };
 
-        {!qty ? (
-          <img
-            className="add"
-            onClick={addItemToCart}
-            src={assets.add_icon_white}
-            alt="Add"
-          />
-        ) : (
-          <div className="full-item-counter">
-            <img
-              onClick={() => removeFromCart(cartKey)}
-              src={assets.remove_icon_red}
-              alt="Remove"
-            />
-            <p>{qty}</p>
-            <img
-              onClick={addItemToCart}
-              src={assets.add_icon_green}
-              alt="Add"
-            />
-          </div>
-        )}
+  return (
+    <div className="full-item" id={`item-${id}`}>
+      {/* IMAGE CLICK OPENS PRODUCT PAGE */}
+      <div
+        className="full-item-img-container"
+        onClick={() => navigate(`/product/${id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <img className="full-item-image" src={imageUrl} alt={name} />
       </div>
 
       <div className="full-item-info">
@@ -105,7 +87,6 @@ const FullItem = ({ id, name, price, description, image, category }) => {
         <div className="customize-box">
           <h4>Choose Options</h4>
 
-          {/* Color 1 */}
           <div className="customize-row">
             <label>Color 1:</label>
             <select value={color1} onChange={(e) => setColor1(e.target.value)}>
@@ -117,7 +98,6 @@ const FullItem = ({ id, name, price, description, image, category }) => {
             </select>
           </div>
 
-          {/* Color 2 */}
           <div className="customize-row">
             <label>Color 2:</label>
             <select value={color2} onChange={(e) => setColor2(e.target.value)}>
@@ -129,7 +109,6 @@ const FullItem = ({ id, name, price, description, image, category }) => {
             </select>
           </div>
 
-          {/* Size ONLY Home Decor Resin */}
           {showSize && (
             <div className="customize-row">
               <label>Size:</label>
@@ -143,7 +122,6 @@ const FullItem = ({ id, name, price, description, image, category }) => {
             </div>
           )}
 
-          {/* Custom text ONLY Personalized Resin Art + Custom Orders */}
           {showCustomText && (
             <div className="customize-row">
               <label>Custom Text:</label>
@@ -156,6 +134,19 @@ const FullItem = ({ id, name, price, description, image, category }) => {
             </div>
           )}
         </div>
+
+        {/* CART BUTTONS */}
+        {!qty ? (
+          <button className="add-btn" onClick={addItemToCart}>
+            Add to Cart
+          </button>
+        ) : (
+          <div className="qty-box">
+            <button onClick={removeItemFromCart}>-</button>
+            <span>{qty}</span>
+            <button onClick={addItemToCart}>+</button>
+          </div>
+        )}
       </div>
     </div>
   );

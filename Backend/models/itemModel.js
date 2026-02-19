@@ -7,18 +7,11 @@ const itemSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     category: { type: String, required: true, trim: true },
 
-    /**
-     * With Cloudinary, store the full image URL here.
-     * Example:
-     * https://res.cloudinary.com/.../image/upload/...jpg
-     */
-    image: { type: String, required: true, trim: true },
+    // ✅ Multiple images (Temu style)
+    images: { type: [String], required: true, default: [] },
 
-    /**
-     * Optional but recommended:
-     * Store Cloudinary public_id so you can delete the image later.
-     */
-    cloudinaryId: { type: String, default: null },
+    // ✅ Store cloudinary public ids (so you can delete later)
+    cloudinaryIds: { type: [String], default: [] },
   },
   { timestamps: true }
 );
