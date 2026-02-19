@@ -21,7 +21,6 @@ const Orders = ({ url }) => {
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
-      withCredentials: true,
     };
   };
 
@@ -34,7 +33,8 @@ const Orders = ({ url }) => {
         return;
       }
 
-      const response = await axios.get(`${url}/api/orders/list`, headersObj);
+      // ✅ FIXED: /api/order/list (NOT /api/orders/list)
+      const response = await axios.get(`${url}/api/order/list`, headersObj);
 
       if (response.data.success) {
         setOrders(response.data.data || []);
@@ -52,12 +52,11 @@ const Orders = ({ url }) => {
     fetchAllOrders();
   }, [adminToken]);
 
-  // ✅ Socket: refresh orders when new order comes in
+  // Socket: refresh orders when new order comes in
   useEffect(() => {
     if (!adminToken) return;
 
     const socket = io(url, {
-      transports: ["websocket"],
       auth: { token: adminToken },
     });
 
@@ -87,8 +86,9 @@ const Orders = ({ url }) => {
         return;
       }
 
+      // ✅ FIXED: /api/order/status
       const response = await axios.post(
-        `${url}/api/orders/status`,
+        `${url}/api/order/status`,
         { orderId, status: newStatus },
         headersObj
       );
@@ -125,8 +125,9 @@ const Orders = ({ url }) => {
         return;
       }
 
+      // ✅ FIXED: /api/order/delete
       const res = await axios.post(
-        `${url}/api/orders/delete`,
+        `${url}/api/order/delete`,
         { orderId },
         headersObj
       );
@@ -160,8 +161,9 @@ const Orders = ({ url }) => {
 
       setBulkDeleting(true);
 
+      // ✅ FIXED: /api/order/delete-failed
       const res = await axios.post(
-        `${url}/api/orders/delete-failed`,
+        `${url}/api/order/delete-failed`,
         { olderThanHours: 24 },
         headersObj
       );
