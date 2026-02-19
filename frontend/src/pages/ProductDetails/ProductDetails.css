@@ -12,197 +12,252 @@
   color: #333;
 }
 
-.product-container {
+/* ---------------- TEMU STYLE LAYOUT ---------------- */
+.temu-product-layout {
   display: grid;
-  grid-template-columns: 520px 1fr;
-  gap: 40px;
-  align-items: flex-start;
+  grid-template-columns: 95px 520px 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-/* ---------------- LEFT SIDE (GALLERY) ---------------- */
-.product-gallery {
-  display: flex;
-  gap: 14px;
-}
-
-/* Thumbnails column */
-.product-thumbnails {
-  width: 85px;
+/* ---------------- LEFT: THUMBNAILS ---------------- */
+.temu-thumbs {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 520px;
+  gap: 12px;
+  max-height: 560px;
   overflow-y: auto;
   padding-right: 4px;
 }
 
-.product-thumbnails img {
-  width: 75px;
-  height: 75px;
-  border-radius: 10px;
+.temu-thumbs img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
   border: 1px solid #ddd;
   cursor: pointer;
   background: #fafafa;
-  object-fit: contain; /* ✅ prevent zoom */
+  object-fit: contain;
   padding: 6px;
+  transition: 0.15s ease;
 }
 
-.product-thumbnails img.active {
+.temu-thumbs img:hover {
+  border-color: #ff6600;
+}
+
+.temu-thumbs img.active {
   border: 2px solid #ff6600;
 }
 
-/* Main big image */
-.product-image-box {
-  width: 420px;
-  height: 520px;
-  border: 1px solid #eee;
+/* ---------------- MIDDLE: MAIN IMAGE ---------------- */
+.temu-main-image {
+  width: 520px;
+  height: 560px;
   border-radius: 18px;
-  overflow: hidden;
+  border: 1px solid #eee;
   background: #fafafa;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 14px;
+  padding: 18px;
+  overflow: hidden;
 }
 
-.product-image-box img {
+.temu-main-image img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* ✅ IMPORTANT */
+  object-fit: contain; /* ✅ prevents zoom */
 }
 
-/* ---------------- RIGHT SIDE (INFO) ---------------- */
-.product-info {
+/* ---------------- RIGHT: PRODUCT INFO ---------------- */
+.temu-info {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  padding-top: 6px;
 }
 
-.product-info h2 {
-  font-size: 24px;
-  font-weight: 700;
+.temu-title {
+  font-size: 26px;
+  font-weight: 800;
   line-height: 1.3;
+  color: #111;
+  margin: 0;
+}
+
+/* rating */
+.temu-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.temu-rating img {
+  width: 85px;
+}
+
+.temu-rating span {
+  font-size: 14px;
+  font-weight: 700;
   color: #111;
 }
 
-.product-price {
-  font-size: 26px;
+.temu-price {
+  font-size: 30px;
+  font-weight: 900;
+  color: #111;
+  margin: 0;
+}
+
+.temu-category {
+  font-size: 14px;
+  color: #777;
+  margin: 0;
+}
+
+.temu-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  max-width: 650px;
+}
+
+/* ---------------- OPTIONS BOX ---------------- */
+.temu-options-box {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 18px;
+  padding: 18px;
+  background: #fcfcfc;
+}
+
+.temu-options-box h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
   font-weight: 800;
   color: #111;
 }
 
-.product-category {
-  font-size: 14px;
-  color: #777;
-}
-
-.product-desc {
-  font-size: 15px;
-  color: #333;
-  line-height: 1.6;
-  max-width: 600px;
-}
-
-/* ---------------- CUSTOMIZE BOX ---------------- */
-.customize-box {
-  margin-top: 10px;
-  border: 1px solid #eee;
-  border-radius: 16px;
-  padding: 16px;
-  background: #fcfcfc;
-}
-
-.customize-box h3 {
-  margin-bottom: 14px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.customize-row {
+.temu-option-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.customize-row label {
+.temu-option-row label {
+  width: 90px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #333;
-  width: 120px;
 }
 
-.customize-row select,
-.customize-row input {
+.temu-option-row select,
+.temu-option-row input {
   flex: 1;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #ddd;
   outline: none;
   font-size: 14px;
+  background: #fff;
 }
 
-/* ---------------- CART BUTTONS ---------------- */
-.cart-actions {
-  margin-top: 16px;
+.temu-option-row select:focus,
+.temu-option-row input:focus {
+  border-color: #ff6600;
 }
 
-.add-btn {
+/* ---------------- ADD TO CART BUTTON ---------------- */
+.temu-add-btn {
   width: 100%;
-  padding: 14px;
-  border-radius: 14px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
   border: none;
   background: #ff6600;
-  color: white;
-  font-size: 16px;
-  font-weight: 700;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
   cursor: pointer;
   transition: 0.2s ease;
 }
 
-.add-btn:hover {
+.temu-add-btn:hover {
   background: #e85a00;
 }
 
+/* qty box */
 .qty-box {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  margin-top: 14px;
 }
 
 .qty-box button {
-  width: 45px;
-  height: 45px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   border: 1px solid #ddd;
   background: #fff;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .qty-box span {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
+  color: #111;
 }
 
 /* ---------------- RESPONSIVE ---------------- */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .product-page {
     padding: 25px 20px;
   }
 
-  .product-container {
+  .temu-product-layout {
+    grid-template-columns: 90px 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .temu-main-image {
+    width: 100%;
+    max-width: 520px;
+    height: 520px;
+  }
+
+  .temu-info {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .temu-product-layout {
     grid-template-columns: 1fr;
   }
 
-  .product-gallery {
-    justify-content: center;
+  .temu-thumbs {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 10px;
   }
 
-  .product-image-box {
+  .temu-main-image {
     width: 100%;
-    max-width: 520px;
+    height: 420px;
+  }
+
+  .temu-thumbs img {
+    width: 70px;
+    height: 70px;
   }
 }
