@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ------------------ ENSURE UPLOADS FOLDER EXISTS ------------------
-// (Not needed for Cloudinary, but harmless + keeps old local support)
+// (Not needed for Cloudinary, but harmless)
 const uploadPath = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
@@ -44,60 +44,73 @@ app.get("/api/debug/cloudinary", (req, res) => {
 
 // ------------------ ALLOWED ORIGINS ------------------
 const allowedOrigins = [
-  // ✅ Your custom domain
+  // ✅ Custom domain (frontend)
   "https://ladybresinartgallery.com",
   "https://www.ladybresinartgallery.com",
 
-  // Render domains (keep)
-  "https://resin-art-store-frontend.onrender.com",
+  // ✅ Admin Render domain
   "https://resin-art-store-admin.onrender.com",
+
+  // ✅ Frontend Render domain
+  "https://resin-art-store-frontend.onrender.com",
 
   // Local dev
   "http://localhost:5173",
   "http://localhost:5174",
 ];
 
+// ------------------ CORS FUNCTION (IMPORTANT FIX) ------------------
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Postman, server-to-server, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // Allow exact matches
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    // ✅ Allow any Render subdomain (VERY IMPORTANT)
+    if (origin.endsWith(".onrender.com")) return callback(null, true);
+
+    // Block everything else
+    return callback(new Error("CORS blocked for origin: " + origin), false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+};
+
 // ------------------ SOCKET.IO ------------------
 export const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
-// ✅ IMPORTANT: prevent circular import issues
+// Prevent circular import issues
 global.io = io;
 
 io.on("connection", (socket) => {
-  console.log("✅ Admin/User connected:", socket.id);
+  console.log("✅ Socket connected:", socket.id);
 
-  socket.on("disconnect", () => {
-    console.log("❌ Disconnected:", socket.id);
+  socket.on("disconnect", (reason) => {
+    console.log("❌ Socket disconnected:", socket.id, "| reason:", reason);
   });
 });
 
 // ------------------ MIDDLEWARE ------------------
 app.use(express.json());
+app.use(cors(corsOptions));
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "token"],
-  })
-);
+// Handle preflight properly
+app.options("*", cors(corsOptions));
 
 // ------------------ ROUTES ------------------
 app.use("/api/user", userRouter);
 app.use("/api/item", itemRouter);
 app.use("/api/cart", cartRouter);
 
-// Your real route:
+// Main route
 app.use("/api/order", orderRouter);
 
-// 🔥 Compatibility alias (fixes frontend calling /api/orders/*)
+// Compatibility alias (fixes frontend calling /api/orders/*)
 app.use("/api/orders", orderRouter);
 
 app.use("/api/payment", paymentRouter);
