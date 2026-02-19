@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 
 const Orders = ({ url }) => {
-  const { adminToken } = useAdminAuth();
+  const { adminToken, logout } = useAdminAuth();
 
   const [orders, setOrders] = useState([]);
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -33,16 +33,29 @@ const Orders = ({ url }) => {
         return;
       }
 
-      // ✅ FIXED: /api/order/list (NOT /api/orders/list)
+      // ✅ Correct route
       const response = await axios.get(`${url}/api/order/list`, headersObj);
 
-      if (response.data.success) {
-        setOrders(response.data.data || []);
+      if (response.data?.success) {
+        // ✅ FIX: backend might return orders OR data
+        const fetchedOrders =
+          response.data.orders || response.data.data || response.data.items || [];
+
+        setOrders(Array.isArray(fetchedOrders) ? fetchedOrders : []);
       } else {
-        toast.error(response.data.message || "Error fetching orders");
+        setOrders([]);
+        toast.error(response.data?.message || "Error fetching orders");
       }
     } catch (err) {
       console.error("🔥 Error fetching orders:", err);
+
+      // ✅ If token is invalid, logout
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        return;
+      }
+
       toast.error(err.response?.data?.message || "Network error fetching orders");
     }
   };
@@ -58,6 +71,7 @@ const Orders = ({ url }) => {
 
     const socket = io(url, {
       auth: { token: adminToken },
+      transports: ["websocket"],
     });
 
     socket.on("connect", () =>
@@ -86,14 +100,13 @@ const Orders = ({ url }) => {
         return;
       }
 
-      // ✅ FIXED: /api/order/status
       const response = await axios.post(
         `${url}/api/order/status`,
         { orderId, status: newStatus },
         headersObj
       );
 
-      if (response.data.success) {
+      if (response.data?.success) {
         toast.success("✅ Order status updated");
 
         setOrders((prev) =>
@@ -102,10 +115,17 @@ const Orders = ({ url }) => {
           )
         );
       } else {
-        toast.error(response.data.message || "Failed to update order status");
+        toast.error(response.data?.message || "Failed to update order status");
       }
     } catch (err) {
       console.error("🔥 Status update error:", err);
+
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        return;
+      }
+
       toast.error(err.response?.data?.message || "Network error updating status");
     }
   };
@@ -125,7 +145,6 @@ const Orders = ({ url }) => {
         return;
       }
 
-      // ✅ FIXED: /api/order/delete
       const res = await axios.post(
         `${url}/api/order/delete`,
         { orderId },
@@ -140,6 +159,13 @@ const Orders = ({ url }) => {
       }
     } catch (err) {
       console.error("Delete order error:", err);
+
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        return;
+      }
+
       toast.error(err.response?.data?.message || "Delete failed");
     }
   };
@@ -161,7 +187,6 @@ const Orders = ({ url }) => {
 
       setBulkDeleting(true);
 
-      // ✅ FIXED: /api/order/delete-failed
       const res = await axios.post(
         `${url}/api/order/delete-failed`,
         { olderThanHours: 24 },
@@ -169,13 +194,20 @@ const Orders = ({ url }) => {
       );
 
       if (res.data?.success) {
-        toast.success(res.data.message || "Bulk delete done");
+        toast.success(res.data?.message || "Bulk delete done");
         fetchAllOrders();
       } else {
         toast.error(res.data?.message || "Bulk delete failed");
       }
     } catch (err) {
       console.error("Bulk delete error:", err);
+
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        return;
+      }
+
       toast.error(err.response?.data?.message || "Bulk delete failed");
     } finally {
       setBulkDeleting(false);
