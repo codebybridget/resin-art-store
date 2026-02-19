@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {
   resinColors,
   getSizesForCategory,
-  sizeExtra,
+  sizeMultiplier,
   isCustomizationCategory,
 } from "../../data/resinOptions";
 
@@ -37,7 +37,11 @@ const FullItem = ({ id, name, price, description, images = [], category }) => {
   const showSize = normalizedCategory === "home decor resin";
   const showCustomText = isCustomizationCategory(category);
 
-  const finalPrice = showSize ? Number(price) + sizeExtra(size) : Number(price);
+  // ✅ FINAL PRICE: multiplier for Home Decor Resin
+  const basePrice = Number(price) || 0;
+  const finalPrice = showSize
+    ? basePrice * sizeMultiplier(size)
+    : basePrice;
 
   const safeSize = showSize ? size : "One Size";
   const safeCustomText = showCustomText ? customText.trim() : "";

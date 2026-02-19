@@ -146,15 +146,24 @@ const Add = ({ url }) => {
           <input
             ref={fileInputRef}
             onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              setImages(files);
+              const newFiles = Array.from(e.target.files || []);
+
+              // ✅ FIX: add new images to the old ones
+              setImages((prev) => {
+                const combined = [...prev, ...newFiles];
+
+                // ✅ max 6 images only
+                return combined.slice(0, 6);
+              });
+
+              // ✅ allow re-selecting same file later
+              e.target.value = "";
             }}
             type="file"
             id="images"
             accept="image/png,image/jpeg,image/jpg,image/webp"
             multiple
             hidden
-            required
           />
 
           {/* ✅ PREVIEW ALL IMAGES */}

@@ -7,7 +7,7 @@ import { assets } from "../../asset/assets";
 import {
   resinColors,
   getSizesForCategory,
-  sizeExtra,
+  sizeMultiplier,
   isCustomizationCategory,
 } from "../../data/resinOptions";
 
@@ -54,7 +54,7 @@ const ProductDetails = () => {
     } else {
       setSelectedImage(assets.placeholder);
     }
-  }, [product]);
+  }, [id, safeImages.length]);
 
   const sizes = useMemo(() => getSizesForCategory(category), [category]);
 
@@ -72,7 +72,9 @@ const ProductDetails = () => {
   const showSize = normalizedCategory === "home decor resin";
   const showCustomText = isCustomizationCategory(category);
 
-  const finalPrice = showSize ? Number(price) + sizeExtra(size) : Number(price);
+  // ✅ FINAL PRICE: multiplier for Home Decor Resin
+  const basePrice = Number(price) || 0;
+  const finalPrice = showSize ? basePrice * sizeMultiplier(size) : basePrice;
 
   const safeSize = showSize ? size : "One Size";
   const safeCustomText = showCustomText ? customText.trim() : "";

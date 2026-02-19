@@ -18,10 +18,7 @@ export const resinColors = [
 const homeDecorSizes = ["Small", "Medium", "Large"];
 
 // Categories where we show custom text input
-const customTextCategories = [
-  "personalized resin art",
-  "custom orders",
-];
+const customTextCategories = ["personalized resin art", "custom orders"];
 
 // Get sizes based on category
 export const getSizesForCategory = (category) => {
@@ -32,15 +29,20 @@ export const getSizesForCategory = (category) => {
   return ["One Size"];
 };
 
-// Extra price for Home Decor Resin sizes
-export const sizeExtra = (size) => {
+/**
+ * ✅ PRICE MULTIPLIER FOR HOME DECOR RESIN
+ * Small  = base price × 1
+ * Medium = base price × 2
+ * Large  = base price × 3
+ */
+export const sizeMultiplier = (size) => {
   const s = String(size || "").trim().toLowerCase();
 
-  if (s === "small") return 0;
-  if (s === "medium") return 1000;
-  if (s === "large") return 2000;
+  if (s === "small") return 1;
+  if (s === "medium") return 2;
+  if (s === "large") return 3;
 
-  return 0;
+  return 1;
 };
 
 // Check if category supports custom text
