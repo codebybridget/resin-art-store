@@ -1,28 +1,73 @@
-.food-display {
-    margin-top: 30px;
-    padding: 0 10px;
+.item-display {
+  width: 100%;
+  padding: 20px 60px;
+  background: #fff;
 }
 
-.food-display h2 {
-    font-size: max(2vw, 24px);
-    font-weight: 600;
-    margin-bottom: 20px;
-    text-align: center;
+.item-display h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #111;
 }
 
-.food-display-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 30px;
-    justify-items: center;
+/* GRID LAYOUT (4 COLUMNS LIKE SCREENSHOT) */
+.item-display-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  align-items: start;
 }
 
-@media (max-width: 768px) {
-    .food-display h2 { font-size: 20px; }
-    .food-display-list { gap: 20px; }
+/* NO RESULTS BOX */
+.no-items-box {
+  width: 100%;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  margin-top: 20px;
 }
 
-@media (max-width: 480px) {
-    .food-display h2 { font-size: 18px; }
-    .food-display-list { gap: 15px; }
+.no-items-box h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.no-items-box p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .item-display {
+    padding: 20px 25px;
+  }
+
+  .item-display-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .item-display-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .item-display {
+    padding: 18px 14px;
+  }
+
+  .item-display h2 {
+    font-size: 18px;
+  }
+
+  .item-display-list {
+    grid-template-columns: 1fr;
+  }
 }
