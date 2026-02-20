@@ -42,9 +42,7 @@
 }
 
 /* RESPONSIVE */
-
-/* Tablet → 3 columns */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .item-display {
     padding: 20px 25px;
   }
@@ -54,46 +52,22 @@
   }
 }
 
-/* Improve card spacing for 2-column phone view */
-@media (max-width: 600px) {
+@media (max-width: 900px) {
+  .item-display-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .item-display {
+    padding: 18px 14px;
+  }
+
+  .item-display h2 {
+    font-size: 18px;
+  }
 
   .item-display-list {
-    gap: 14px;
-  }
-
-  .full-item {
-    border-radius: 12px;
-  }
-
-  .full-item-img-container {
-    height: 150px; /* slightly smaller for phone */
-    padding: 8px;
-  }
-
-  .full-item-name-rating p {
-    font-size: 14px;
-  }
-
-  .full-item-desc {
-    font-size: 12px;
-  }
-
-  .full-item-price {
-    font-size: 16px;
-  }
-
-  .customize-box {
-    padding: 10px;
-  }
-
-  .customize-row select,
-  .customize-row input {
-    font-size: 12px;
-    padding: 7px 8px;
-  }
-
-  .add-btn {
-    padding: 10px;
-    font-size: 14px;
+    grid-template-columns: 1fr;
   }
 }
