@@ -37,6 +37,46 @@
   font-size: 16px;
   margin-bottom: 8px;
   font-weight: 700;
+<<<<<<< HEAD
+=======
+}
+
+.no-items-box p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+/* Laptop → 3 columns */
+@media (max-width: 1200px) {
+  .item-display-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tablet → 2 columns */
+@media (max-width: 900px) {
+  .item-display-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile → 1 column */
+@media (max-width: 520px) {
+  .item-display {
+    padding: 18px 14px;
+  }
+
+  .item-display h2 {
+    font-size: 18px;
+  }
+
+  .item-display-list {
+    grid-template-columns: 1fr;
+  }
+>>>>>>> 1ad518a9ba51a0b360c4f44618648ab1da9e7081
 }
 
 .no-items-box p {
